@@ -1,0 +1,7 @@
+{"LO": ["logic in computer science"],
+ "DC": ["distributed computing"],
+ "SE": ["software engineering"],
+ "DS": ["data structures and algorithms"],
+ "CL": ["computational linguistics"],
+ "NI": ["networking and internet architecture"],
+ "CR": ["cryptography"]}
