@@ -1,0 +1,21 @@
+{
+    'Engineering': ['engineering'], 
+    'Chemistry': ['chemistry'], 
+    'Computer Science': ['computer science'], 
+    'Business': ['business'], 
+    'Political Science': ['political science'], 
+    'Environmental Science': ['environmental science'], 
+    'Physics': ['physics'], 
+    'Economics': ['economics'], 
+    'Geography': ['geography'], 
+    'Medicine': ['medicine'], 
+    'Psychology': ['psychology'], 
+    'Art': ['art'], 
+    'Materials Science': ['materials science'], 
+    'Mathematics': ['mathematics'], 
+    'Sociology': ['sociology'], 
+    'Geology': ['geology'], 
+    'Philosophy': ['philosophy'], 
+    'Biology': ['biology'], 
+    'History': ['history']
+}
