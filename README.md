@@ -1,8 +1,8 @@
-# SciPrompt
-The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Knowledge-augmented Prompting for Fine-grainedCategorization of Scientific Topics](https://aclanthology.org/2024.emnlp-main.350/)
-
 [![Conference](https://img.shields.io/badge/EMNLP-2024-4b44ce)](https://2024.emnlp.org/)
 [![Paper](http://img.shields.io/badge/paper-EMNLP--anthology-B31B1B.svg)](https://aclanthology.org/2024.emnlp-main.350.pdf)
+
+# SciPrompt
+The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Knowledge-augmented Prompting for Fine-grainedCategorization of Scientific Topics](https://aclanthology.org/2024.emnlp-main.350/)
 
 **Fine-tuned filtering model:** [Google Drive](https://drive.google.com/drive/folders/1z38v6nx0pss_hhD2dX9Kg7NXQSNVSIWK?usp=sharing)
 
