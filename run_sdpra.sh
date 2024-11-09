@@ -1,0 +1,13 @@
+python sdpra_script.py \
+    --zero_shot no \
+    --shots 5 \
+    --calibration true \
+    --max_epochs 5 \
+    --batch_size 5 \
+    --learning_rate 3e-5 \
+    --cuda_device 0 \
+    --data_dir "/path/to/data" \
+    --config_path "config/sdpra_label_mappings.json" \
+    --verbalizer_path "/path/to/verbalizer.txt" \
+    --semantic_score_path "/path/to/semantic_scores.txt" \
+    --zero_shot no

@@ -1,0 +1,15 @@
+python arXiv_script.py \
+    --seed 144 \
+    --shots 5 \
+    --calibration True \
+    --max_seq_length 256 \
+    --batch_size 5 \
+    --max_epochs 5 \
+    --cuda_device 0 \
+    --learning_rate 3e-5 \
+    --data_dir "/path/to/your/data/directory" \
+    --verbalizer_path "/path/to/your/arXiv_knowledgable_verbalizer.txt" \
+    --semantic_score_path "/path/to/your/arXiv_knowledgable_verbalizer_semantic_search_scores.txt" \
+    --doc_id_path "/path/to/your/doc_id.txt" \
+    --config_path "config/arxiv_label_mappings.json" \
+    --zero_shot no
