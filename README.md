@@ -17,6 +17,26 @@ conda create -n SciPrompt python=3.8.12
 pip install -r requirements.txt
 ```
 
+### Prepare the Required Files and Directories
+
+- Replace the placeholder paths in the script with actual paths to your data and configuration files:
+  - --data_dir should point to your data directory
+  - --verbalizer_path should point to your arXiv_knowledgable_verbalizer.txt
+  - --semantic_score_path should point to your arXiv_knowledgable_verbalizer_semantic_search_scores.txt
+  - --doc_id_path should point to your doc_id.txt
+  - --config_path should point to config/arxiv_label_mappings.json
+
+### Run the main script:
+
+- Execute scripts for each dataset:
+```bash
+bash run_arxiv.sh
+bash run_s2orc.sh
+bash run_sdpra.sh
+```
+**Note: Please modify the required data file paths inside each script before running.**
+
+
 ### Citation Information
 ```bibtex
 
