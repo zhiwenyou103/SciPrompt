@@ -6,7 +6,7 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 ### Overall Framework
 <div align="center">
-  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="200", width="200">
+  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="400" width="400">
 </div>
 
 
