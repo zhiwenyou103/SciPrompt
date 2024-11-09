@@ -1,0 +1,21 @@
+{
+    "label_name_mapping": {
+        "LO": ["logic in computer science"],
+        "DC": ["distributed computing"],
+        "SE": ["software engineering"],
+        "DS": ["data structures and algorithms"],
+        "CL": ["computational linguistics"],
+        "NI": ["networking and internet architecture"],
+        "CR": ["cryptography"]
+    },
+    "class_labels": ["LO", "DC", "SE", "DS", "CL", "NI", "CR"],
+    "label_dict": {
+        "LO": 0,
+        "DC": 1,
+        "SE": 2,
+        "DS": 3,
+        "CL": 4,
+        "NI": 5,
+        "CR": 6
+    }
+}
