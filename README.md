@@ -6,9 +6,16 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 ### Overall Framework
 <div align="center">
-  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="400" width="400">
+  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="300" width="500">
 </div>
 
+
+### Installation
+To install the necessary Python packages, run the following command:
+```bash
+conda create -n SciPrompt python=3.8.12
+pip install -r requirements.txt
+```
 
 ### Citation Information
 ```bibtex
