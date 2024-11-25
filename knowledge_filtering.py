@@ -9,8 +9,8 @@ from sentence_transformers.cross_encoder import CrossEncoder
 def parse_args():
     parser = argparse.ArgumentParser(description='Process label words for multiple datasets')
     parser.add_argument('--dataset', type=str, required=True,
-                      choices=['s2orc', 'arxiv', 'sdpra', 'all'],
-                      help='Which dataset to process (s2orc, arxiv, sdpra, or all)')
+                    #   choices=['s2orc', 'arxiv', 'sdpra', 'all'],
+                      help='Which dataset to process (s2orc, arxiv, sdpra, all, or your own dataset)')
     
     parser.add_argument('--s2orc_input', type=str,
                       default='/path/to/S2ORC_plain_label_words.json',
@@ -27,11 +27,18 @@ def parse_args():
                       help='Path to arXiv output TXT')
     
     parser.add_argument('--sdpra_input', type=str,
-                      default='/path/to/nlp_plain_label_words.json',
+                      default='/path/to/sdpra_plain_label_words.json',
                       help='Path to SDPRA input JSON')
     parser.add_argument('--sdpra_output', type=str,
-                      default='/path/to/nlp_plain_label_words.txt',
+                      default='/path/to/sdpra_plain_label_words.txt',
                       help='Path to SDPRA output TXT')
+    
+    parser.add_argument('--new_dataset_input', type=str,
+                  default='/path/to/new_dataset_plain_label_words.json',
+                  help='Path to New Dataset input JSON')
+    parser.add_argument('--new_dataset_output', type=str,
+                    default='/path/to/new_dataset_plain_label_words.txt',
+                  help='Path to New Dataset output TXT')
     
     return parser.parse_args()
 
@@ -109,6 +116,7 @@ def main():
             'output': args.sdpra_output,
             'name': 'SDPRA'
         }
+        # Add more datasets here
     }
     
     results = {}
