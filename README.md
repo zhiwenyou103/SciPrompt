@@ -1,5 +1,5 @@
 [![Conference](https://img.shields.io/badge/EMNLP-2024-4b44ce)](https://2024.emnlp.org/)
-[![Paper](http://img.shields.io/badge/paper-EMNLP--anthology-B31B1B.svg)](https://aclanthology.org/2024.emnlp-main.350.pdf)
+[![Paper](http://img.shields.io/badge/paper-ACL--anthology-B31B1B.svg)](https://aclanthology.org/2024.emnlp-main.350.pdf)
 
 # SciPrompt
 The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Knowledge-augmented Prompting for Fine-grainedCategorization of Scientific Topics](https://aclanthology.org/2024.emnlp-main.350/)
@@ -28,6 +28,24 @@ pip install -r requirements.txt
   - --semantic_score_path should point to your arXiv_knowledgable_verbalizer_semantic_search_scores.txt
   - --doc_id_path should point to your doc_id.txt
   - --config_path should point to config/arxiv_label_mappings.json
+ 
+### Knowledge Retrieval and Filtering
+
+- Run our datasets:
+  - Change corresponding paths when running the `run_knowledge_filtering.sh` script
+  - Process all three datasets (S2ORC, arXiv, SDPRA) at the same time:
+    ```bash
+    bash run_knowledge_filtering.sh
+    ```
+  - Process one of the three datasets:
+    - uncomment any of the dataset and change paths accordingly
+
+- Run using your own dataset:
+  - Change paths when running the `run_knowledge_filtering.sh` script, including: 
+    - `new_dataset_input`
+    - `new_dataset_output`
+  - Add your dataset name and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 103
+  - Run `bash run_knowledge_filtering.sh` in your terminal
 
 ### Run the main script:
 
