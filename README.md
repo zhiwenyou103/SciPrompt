@@ -28,23 +28,21 @@ pip install -r requirements.txt
   - --semantic_score_path should point to your arXiv_knowledgable_verbalizer_semantic_search_scores.txt
   - --doc_id_path should point to your doc_id.txt
   - --config_path should point to config/arxiv_label_mappings.json
- 
+- Prepare your class label dictionary similar to the `.json` files in the [label_mappings](https://github.com/zhiwenyou103/SciPrompt/tree/main/label_mappings) folder
+  
 ### Knowledge Retrieval and Filtering
 
 - Run our datasets:
-  - Change corresponding paths when running the `run_knowledge_filtering.sh` script
-  - Process all three datasets (S2ORC, arXiv, SDPRA) at the same time:
+  - Step 1: Change paths in `run_retrieval.sh` and run `bash run_retrieval.sh`
+  - Step 2: Change paths of the filtering model, retrieved data (from Step 1), and output files in the `run_knowledge_filtering.sh` script
+  - Step 3: Run the filtering script:
     ```bash
     bash run_knowledge_filtering.sh
     ```
-  - Process one of the three datasets:
-    - uncomment any of the dataset and change paths accordingly
 
 - Run using your own dataset:
-  - Change paths when running the `run_knowledge_filtering.sh` script, including: 
-    - `new_dataset_input`
-    - `new_dataset_output`
-  - Add your dataset name and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 103
+  - Step 1 and 2 are the same as above
+  - Step 3: Change your dataset name as `custom` and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 189
   - Run `bash run_knowledge_filtering.sh` in your terminal
 
 ### Run the main script:
