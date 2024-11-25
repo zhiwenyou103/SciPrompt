@@ -38,7 +38,7 @@ pip install -r requirements.txt
     bash run_knowledge_filtering.sh
     ```
   - Process one of the three datasets:
-    - uncommont any of the dataset and change paths accordingly
+    - uncomment any of the dataset and change paths accordingly
 
 - Run using your own dataset:
   - Change paths when running the `run_knowledge_filtering.sh` script, including: 
