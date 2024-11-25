@@ -9,7 +9,7 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 ### Overall Framework
 <div align="center">
-  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="300" width="500">
+  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="300" width="400">
 </div>
 
 
@@ -53,6 +53,11 @@ bash run_arxiv.sh
 bash run_s2orc.sh
 bash run_sdpra.sh
 ```
+- Run on your own data (need two input files: one only contains data, one only has labels, as used in [arXiv](https://github.com/zhiwenyou103/SciPrompt/tree/main/data/arXiv)):
+```bash
+bash run_custom_script.sh
+```
+
 **Note: Please modify the required data file paths inside each script before running.**
 
 

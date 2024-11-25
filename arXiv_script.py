@@ -31,19 +31,19 @@ def parse_args():
     parser.add_argument('--learning_rate', type=float, default=3e-5, help='Learning rate')
     parser.add_argument('--soft_verbalizer', type=bool, default=False, help='Whether to use soft verbalizer')
     parser.add_argument('--data_dir', type=str, 
-                       default="/home/zhiweny2/chatbotai/jerome/KAPT/arxiv/arXiv/new_sample/",
+                       default="/path/to/data",
                        help='Data directory')
     parser.add_argument('--verbalizer_path', type=str,
-                       default='/root/KAPT/filtered_knowledge_words/arXiv_knowledgable_verbalizer.txt',
+                       default='path/to/filtered_knowledgable_verbalizer.txt',
                        help='Path to verbalizer file')
     parser.add_argument('--semantic_score_path', type=str,
-                       default='/home/zhiweny2/chatbotai/jerome/KAPT/filtered_knowledge_words/arXiv_knowledgable_verbalizer_semantic_search_scores.txt',
+                       default='path/to/filtered_knowledgable_verbalizer_semantic_search_scores.txt',
                        help='Path to semantic scores file')
     parser.add_argument('--doc_id_path', type=str, 
-                       default="/home/zhiweny2/chatbotai/jerome/KAPT/arxiv/arXiv/doc_id.txt",
-                       help='Path to doc_id.txt file')
+                       default="path/to/label_dict.txt",
+                       help='Path to label_dict.txt file')
     parser.add_argument('--config_path', type=str,
-                       default='config/arxiv_label_mappings.json',
+                       default='label_mappings/arxiv_label_mappings.json',
                        help='Path to label configuration file')
     parser.add_argument('--zero_shot', type=str, default='no', 
                        choices=['yes', 'no'], 

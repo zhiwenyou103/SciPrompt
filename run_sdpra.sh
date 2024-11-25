@@ -1,13 +1,15 @@
 python sdpra_script.py \
-    --zero_shot no \
+    --seed 144 \
     --shots 5 \
-    --calibration true \
-    --max_epochs 5 \
+    --calibration True \
+    --max_seq_length 256 \
     --batch_size 5 \
-    --learning_rate 3e-5 \
+    --max_epochs 5 \
     --cuda_device 0 \
-    --data_dir "/path/to/data" \
-    --config_path "config/sdpra_label_mappings.json" \
-    --verbalizer_path "/path/to/verbalizer.txt" \
-    --semantic_score_path "/path/to/semantic_scores.txt" \
+    --learning_rate 3e-5 \
+    --data_dir "/path/to/your/data/" \
+    --verbalizer_path "/path/to/your/sdpra_knowledgable_verbalizer.txt" \
+    --semantic_score_path "/path/to/your/sdpra_knowledgable_verbalizer_semantic_search_scores.txt" \
+    --doc_id_path "/path/to/your/label_dict.txt" \
+    --config_path "label_mappings/SDPRA_label_mappings.json" \
     --zero_shot no

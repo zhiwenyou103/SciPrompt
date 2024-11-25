@@ -1,4 +1,4 @@
-python s2orc_script.py \
+python custom_script.py \
     --seed 144 \
     --shots 5 \
     --calibration True \
@@ -8,8 +8,8 @@ python s2orc_script.py \
     --cuda_device 0 \
     --learning_rate 3e-5 \
     --data_dir "/path/to/your/data/" \
-    --verbalizer_path "/path/to/your/s2orc_knowledgable_verbalizer.txt" \
-    --semantic_score_path "/path/to/your/s2orc_knowledgable_verbalizer_semantic_search_scores.txt" \
+    --verbalizer_path "/path/to/your/custom_knowledgable_verbalizer.txt" \
+    --semantic_score_path "/path/to/your/custom_knowledgable_verbalizer_semantic_search_scores.txt" \
     --doc_id_path "/path/to/your/label_dict.txt" \
-    --config_path "label_mappings/S2ORC_label_mappings.json" \
+    --config_path "label_mappings/custom_label_mappings.json" \
     --zero_shot no

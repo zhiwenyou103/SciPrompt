@@ -3,37 +3,33 @@ import argparse
 import torch
 import csv
 import copy
+import pickle
+import json
 from tqdm import tqdm
 from transformers import (
     AdamW, 
     get_linear_schedule_with_warmup, 
     BertTokenizer
 )
-from contextualize_calibration import calibrate
 from openprompt.plms import load_plm
-from openprompt.prompts import WeightedVerbalizer, ManualTemplate, SoftVerbalizer
+from openprompt.prompts import ManualTemplate, WeightedVerbalizer, SoftVerbalizer
 from openprompt.data_utils import InputExample
 from openprompt import PromptDataLoader, PromptForClassification
 from openprompt.data_utils.data_sampler import FewShotSampler
 from openprompt.utils.reproduciblity import set_seed
-import json
-
+from contextualize_calibration import calibrate
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='SDPRA KAPT Training')
+    parser = argparse.ArgumentParser(description='ArXiv KAPT Training')
     parser.add_argument('--seed', type=int, default=144, help='Random seed')
     parser.add_argument('--shots', type=int, default=1, help='Number of shots')
     parser.add_argument('--calibration', type=bool, default=True, help='Whether to use calibration')
     parser.add_argument('--max_seq_length', type=int, default=256, help='Maximum sequence length')
     parser.add_argument('--batch_size', type=int, default=5, help='Batch size')
     parser.add_argument('--max_epochs', type=int, default=5, help='Maximum epochs')
-    parser.add_argument('--cuda_device', type=int, default=3, help='CUDA device index')
+    parser.add_argument('--cuda_device', type=int, default=2, help='CUDA device index')
     parser.add_argument('--learning_rate', type=float, default=3e-5, help='Learning rate')
     parser.add_argument('--soft_verbalizer', type=bool, default=False, help='Whether to use soft verbalizer')
-                      help='Path to label mappings config file')
-    parser.add_argument('--zero_shot', type=str, default='no', 
-                       choices=['yes', 'no'], 
-                       help='Whether to run in zero-shot mode')
     parser.add_argument('--data_dir', type=str, 
                        default="/path/to/data",
                        help='Data directory')
@@ -47,25 +43,92 @@ def parse_args():
                        default="path/to/label_dict.txt",
                        help='Path to label_dict.txt file')
     parser.add_argument('--config_path', type=str,
-                       default='label_mappings/SDORA_label_mappings.json',
+                       default='label_mappings/arxiv_label_mappings.json',
                        help='Path to label configuration file')
+    parser.add_argument('--zero_shot', type=str, default='no', 
+                       choices=['yes', 'no'], 
+                       help='Whether to run in zero-shot mode')
     return parser.parse_args()
 
-def create_prompt_dataloader(dataset, template, tokenizer, WrapperClass, args, shuffle=False):
-    """Helper function to create prompt dataloader"""
-    return PromptDataLoader(
-        dataset=dataset,
-        template=template,
-        tokenizer=tokenizer,
-        tokenizer_wrapper_class=WrapperClass,
-        max_seq_length=args.max_seq_length,
-        decoder_max_length=16,
-        batch_size=args.batch_size,
-        shuffle=shuffle,
-        teacher_forcing=False,
-        predict_eos_token=False,
-        truncate_method="tail"
-    )
+def load_config(config_path):
+    """Load label configurations from JSON file"""
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+    return config['label_dict'], config['label_name_mapping']
+
+def get_class_labels(doc_id_path):
+    """Load class labels from doc_id file"""
+    with open(doc_id_path, 'r') as file:
+        class_labels = [line.strip().split('\t')[0] for line in file]
+    return class_labels
+
+def get_examples(data_dir, type1, type2, tokenizer, label_dict):
+    """Load and process examples from data files with support for different formats
+    
+    Args:
+        data_dir (str): Directory containing the data files
+        type1 (str): Name of the data file (without extension)
+        type2 (str): Name of the label file (without extension)
+        tokenizer: Tokenizer instance
+        label_dict (dict): Dictionary mapping labels to IDs
+        
+    Returns:
+        list: List of InputExample objects
+    """
+    examples = []
+    data_file = None
+    label_file = None
+    for ext in ['.txt', '.csv', '.json']:
+        if os.path.exists(os.path.join(data_dir, f"{type1}{ext}")):
+            data_file = os.path.join(data_dir, f"{type1}{ext}")
+            label_file = os.path.join(data_dir, f"{type2}{ext}")
+            file_format = ext[1:]
+            break
+    
+    if not data_file or not os.path.exists(label_file):
+        raise FileNotFoundError(f"Could not find matching data and label files for {type1} and {type2}")
+
+    if file_format == 'txt':
+        with open(data_file, 'r') as f, open(label_file, 'r') as l:
+            for idx, (paragraph, label) in enumerate(zip(f, l)):
+                paragraph = paragraph.strip()
+                label = label.strip()
+                label_id = label_dict[label]
+                inputs = tokenizer(paragraph, return_tensors="pt")
+                if len(inputs["input_ids"][0]) < 30:
+                    continue
+                example = InputExample(guid=str(idx), text_a=paragraph, label=int(label_id))
+                examples.append(example)
+    
+    elif file_format == 'csv':
+        with open(data_file, 'r') as f, open(label_file, 'r') as l:
+            data_reader = csv.reader(f)
+            label_reader = csv.reader(l)
+            for idx, (data_row, label_row) in enumerate(zip(data_reader, label_reader)):
+                paragraph = data_row[0].strip()
+                label = label_row[0].strip()
+                label_id = label_dict[label]
+                inputs = tokenizer(paragraph, return_tensors="pt")
+                if len(inputs["input_ids"][0]) < 30:
+                    continue
+                example = InputExample(guid=str(idx), text_a=paragraph, label=int(label_id))
+                examples.append(example)
+    
+    elif file_format == 'json':
+        with open(data_file, 'r') as f, open(label_file, 'r') as l:
+            data_list = json.load(f)
+            label_list = json.load(l)
+            for idx, (data_item, label_item) in enumerate(zip(data_list, label_list)):
+                paragraph = data_item['text'].strip()
+                label = label_item['label'].strip()
+                label_id = label_dict[label]
+                inputs = tokenizer(paragraph, return_tensors="pt")
+                if len(inputs["input_ids"][0]) < 30:
+                    continue
+                example = InputExample(guid=str(idx), text_a=paragraph, label=int(label_id))
+                examples.append(example)
+
+    return examples
 
 def setup_model(args, tokenizer, plm, WrapperClass, class_labels):
     """Setup the prompt model with template and verbalizer"""
@@ -84,18 +147,19 @@ def setup_model(args, tokenizer, plm, WrapperClass, class_labels):
                 label_score_single_group = []
             else:
                 label_score_single_group.append(line)
+        
         if len(label_score_single_group) > 0:
             label_words_all_score.append(label_score_single_group)
 
         label_words_scores = label_words_all_score[0]
         label_words_scores = [label_words_per_label.strip().split(",") 
                             for label_words_per_label in label_words_scores]
-        
+
     if args.soft_verbalizer:
         myverbalizer = SoftVerbalizer(
             tokenizer,
             model=plm,
-            classes=CLASS_LABELS,
+            classes=class_labels,
             label_words_scores=label_words_scores,
             multi_token_handler="mean"
         ).from_file(args.verbalizer_path)
@@ -117,9 +181,24 @@ def setup_model(args, tokenizer, plm, WrapperClass, class_labels):
 
     return prompt_model, mytemplate, myverbalizer
 
+def evaluate(prompt_model, dataloader, device, desc="Eval"):
+    """Evaluate model on given dataloader"""
+    prompt_model.eval()
+    allpreds = []
+    alllabels = []
+    
+    with torch.no_grad():
+        for inputs in tqdm(dataloader, desc=desc):
+            inputs = inputs.to(device)
+            logits = prompt_model(inputs)
+            labels = inputs['label']
+            alllabels.extend(labels.cpu().tolist())
+            allpreds.extend(torch.argmax(logits, dim=-1).cpu().tolist())
+            
+    acc = sum([int(i==j) for i,j in zip(allpreds, alllabels)])/len(allpreds)
+    return acc
 
-def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer,
-                         tokenizer, WrapperClass, device):
+def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer, tokenizer, WrapperClass, device, class_labels):
     """Run few-shot training with validation and testing"""
     if args.calibration:
         support_dataloader = PromptDataLoader(
@@ -137,16 +216,15 @@ def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer,
         )
         
         org_label_words_num = [len(prompt_model.verbalizer.label_words[i]) 
-                              for i in range(len(CLASS_LABELS))]
-        print("Original label words num:", org_label_words_num)
+                              for i in range(len(class_labels))]
         
-        from contextualize_calibration import calibrate
         cc_logits = calibrate(prompt_model, support_dataloader)
         print("Calibration logits:", cc_logits)
+        print("Original label words num:", org_label_words_num)
         
         myverbalizer.register_calibrate_logits(cc_logits.mean(dim=0))
         new_label_words_num = [len(myverbalizer.label_words[i]) 
-                              for i in range(len(CLASS_LABELS))]
+                              for i in range(len(class_labels))]
         print("After filtering, label words per class:", new_label_words_num)
 
     sampler = FewShotSampler(
@@ -198,15 +276,19 @@ def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer,
         truncate_method="tail"
     )
 
+    print('Batch size:', len(train_dataloader))
+    batch_size = len(train_dataloader)
+
+    loss_func = torch.nn.CrossEntropyLoss()
     no_decay = ['bias', 'LayerNorm.weight']
     optimizer_grouped_parameters = [
         {
-            'params': [p for n, p in prompt_model.plm.named_parameters() 
+            'params': [p for n, p in prompt_model.named_parameters() 
                       if not any(nd in n for nd in no_decay)],
             'weight_decay': 0.01
         },
         {
-            'params': [p for n, p in prompt_model.plm.named_parameters() 
+            'params': [p for n, p in prompt_model.named_parameters() 
                       if any(nd in n for nd in no_decay)],
             'weight_decay': 0.0
         }
@@ -214,61 +296,50 @@ def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer,
 
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate)
     optimizer2 = AdamW(prompt_model.verbalizer.parameters(), lr=0.0)
-
-    num_training_steps = len(train_dataloader) * args.max_epochs
+    tot_step = len(train_dataloader) // 1 * args.max_epochs
     scheduler = get_linear_schedule_with_warmup(
         optimizer,
         num_warmup_steps=0,
-        num_training_steps=num_training_steps
+        num_training_steps=tot_step
     )
 
+    tot_loss = 0
     best_val_acc = 0
-    best_model_state = None
-    loss_func = torch.nn.CrossEntropyLoss()
-
-    print(f"Starting training with {args.shots} shots per class...")
     for epoch in range(args.max_epochs):
         tot_loss = 0
         prompt_model.train()
-        with tqdm(train_dataloader, desc=f"Epoch {epoch}") as pbar:
-            for step, inputs in enumerate(pbar):
-                inputs = inputs.to(device)
-                logits = prompt_model(inputs)
-                labels = inputs['label']
-                loss = loss_func(logits, labels)
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(prompt_model.parameters(), 1.0)
+        
+        for step, inputs in enumerate(train_dataloader):
+            inputs = inputs.to(device)
+            logits = prompt_model(inputs)
+            labels = inputs['label']
+            loss = loss_func(logits, labels)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(prompt_model.parameters(), 1.0)
+            tot_loss += loss.item()
+            
+            optimizer.step()
+            scheduler.step()
+            optimizer.zero_grad()
+            
+            if optimizer2 is not None:
+                optimizer2.step()
+                optimizer2.zero_grad()
                 
-                optimizer.step()
-                scheduler.step()
-                optimizer.zero_grad()
-                
-                if optimizer2 is not None:
-                    optimizer2.step()
-                    optimizer2.zero_grad()
-                
-                tot_loss += loss.item()
-                pbar.set_postfix({'loss': tot_loss / (step + 1)})
-
-        val_acc = evaluate(prompt_model, validation_dataloader, device, desc='Validation')
-        print(f"Epoch {epoch}, Validation Accuracy: {val_acc:.4f}")
-
+            if step % batch_size == 1:
+                print(f"Epoch {epoch}, average loss: {tot_loss/(step+1)}")
+        
+        val_acc = evaluate(prompt_model, validation_dataloader, device, desc='Valid')
         if val_acc >= best_val_acc:
             best_val_acc = val_acc
-            best_model_state = copy.deepcopy(prompt_model.state_dict())
-            print(f"New best validation accuracy: {best_val_acc:.4f}")
+        print(f"Epoch {epoch}, val_acc {val_acc}")
 
-    if best_model_state is not None:
-        prompt_model.load_state_dict(best_model_state)
-    
     test_acc = evaluate(prompt_model, test_dataloader, device, desc="Test")
-    print(f"\nFinal Results:")
-    print(f"Best Validation Accuracy: {best_val_acc:.4f}")
-    print(f"Test Accuracy: {test_acc:.4f}")
+    print(f"Test acc {test_acc}")
     
     return best_val_acc, test_acc
 
-def run_zero_shot(args, prompt_model, dataset, mytemplate, myverbalizer, tokenizer, WrapperClass, device):
+def run_zero_shot(args, prompt_model, dataset, mytemplate, myverbalizer, tokenizer, WrapperClass, device, class_labels):
     """Run zero-shot evaluation"""
     if args.calibration:
         support_dataloader = PromptDataLoader(
@@ -284,17 +355,17 @@ def run_zero_shot(args, prompt_model, dataset, mytemplate, myverbalizer, tokeniz
             predict_eos_token=False,
             truncate_method="tail"
         )
-
+        
         org_label_words_num = [len(prompt_model.verbalizer.label_words[i]) 
-                              for i in range(len(CLASS_LABELS))]
+                              for i in range(len(class_labels))]
+        print("Original label words num:", org_label_words_num)
         
         cc_logits = calibrate(prompt_model, support_dataloader)
         print("Calibration logits:", cc_logits)
-        print("Original label words num:", org_label_words_num)
-
+        
         myverbalizer.register_calibrate_logits(cc_logits.mean(dim=0))
         new_label_words_num = [len(myverbalizer.label_words[i]) 
-                              for i in range(len(CLASS_LABELS))]
+                              for i in range(len(class_labels))]
         print("After filtering, label words per class:", new_label_words_num)
 
     test_dataloader = PromptDataLoader(
@@ -310,72 +381,41 @@ def run_zero_shot(args, prompt_model, dataset, mytemplate, myverbalizer, tokeniz
         predict_eos_token=False,
         truncate_method="tail"
     )
+
+    test_acc = evaluate(prompt_model, test_dataloader, device, desc="Zero-shot Test")
+    print(f"Zero-shot Test Accuracy: {test_acc:.4f}")
     
-    test_acc = evaluate(prompt_model, test_dataloader, device, "Test")
-    print(f"Zero-shot Accuracy: {test_acc:.4f}")
     return test_acc
-
-
-def load_label_mappings(config_path):
-    """Load label mappings from config file."""
-    if config_path.endswith('.json'):
-        with open(config_path, 'r') as f:
-            config = json.load(f)
-    else:
-        raise ValueError(f"Unsupported config file format: {config_path}")
-    
-    return (
-        config['label_name_mapping'],
-        config['class_labels'],
-        config['label_dict']
-    )
-
-def get_examples(data_dir, type, tokenizer, label_dict):
-    """Load examples from CSV file"""
-    path = os.path.join(data_dir, f"{type}.csv")
-    examples = []
-    
-    with open(path, encoding='utf8') as f:
-        reader = csv.reader(f)
-        for idx, row in enumerate(reader):
-            body, label = row
-            label = label_dict[label]
-            inputs = tokenizer(body, return_tensors="pt")
-            if len(inputs["input_ids"][0]) < 30:
-                continue
-            example = InputExample(guid=str(idx), text_a=body, label=int(label))
-            examples.append(example)
-    return examples
-
-def evaluate(prompt_model, dataloader, device, desc="Eval"):
-    prompt_model.eval()
-    allpreds = []
-    alllabels = []
-    
-    with torch.no_grad():
-        for inputs in tqdm(dataloader, desc=desc):
-            inputs = inputs.to(device)
-            logits = prompt_model(inputs)
-            labels = inputs['label']
-            alllabels.extend(labels.cpu().tolist())
-            allpreds.extend(torch.argmax(logits, dim=-1).cpu().tolist())
-            
-    acc = sum([int(i==j) for i,j in zip(allpreds, alllabels)])/len(allpreds)
-    return acc
 
 def main():
     args = parse_args()
     set_seed(args.seed)
     device = f"cuda:{args.cuda_device}" if torch.cuda.is_available() else "cpu"
-    label_name_mapping, class_labels, label_dict = load_label_mappings(args.config_path)
+    label_dict, label_name_mapping = load_config(args.config_path)
+    class_labels = get_class_labels(args.doc_id_path)
+
     plm, tokenizer, model_config, WrapperClass = load_plm(
         'bert', 
         'allenai/scibert_scivocab_uncased'
     )
+
     dataset = {
-        'train': get_examples(args.data_dir, "train_output", tokenizer, label_dict),
-        'test': get_examples(args.data_dir, "test_output", tokenizer, label_dict)
+        'train': get_examples(
+            args.data_dir,
+            "name_of_train_dataset",
+            "name_of_train_dataset_labels",
+            tokenizer,
+            label_dict
+        ),
+        'test': get_examples(
+            args.data_dir,
+            "name_of_test_dataset",
+            "name_of_test_dataset_labels",
+            tokenizer,
+            label_dict
+        )
     }
+
     prompt_model, mytemplate, myverbalizer = setup_model(
         args, tokenizer, plm, WrapperClass, class_labels
     )
@@ -386,11 +426,15 @@ def main():
             args, prompt_model, dataset, mytemplate, myverbalizer,
             tokenizer, WrapperClass, device, class_labels
         )
+        print(f"Final Zero-shot Accuracy: {test_acc}")
     else:
         best_val_acc, test_acc = run_few_shot_training(
             args, prompt_model, dataset, mytemplate, myverbalizer,
             tokenizer, WrapperClass, device, class_labels
         )
+        print(f"Final Few-shot Results:")
+        print(f"Best Validation Accuracy: {best_val_acc:.4f}")
+        print(f"Test Accuracy: {test_acc:.4f}")
 
 if __name__ == "__main__":
     main()
