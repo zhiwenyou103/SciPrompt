@@ -4,6 +4,8 @@
 # SciPrompt
 The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Knowledge-augmented Prompting for Fine-grainedCategorization of Scientific Topics](https://aclanthology.org/2024.emnlp-main.350/)
 
+This project is developed based on the [OpenPrompt](https://github.com/thunlp/OpenPrompt) framework.
+
 **Fine-tuned filtering model:** [Google Drive](https://drive.google.com/drive/folders/1z38v6nx0pss_hhD2dX9Kg7NXQSNVSIWK?usp=sharing)
 
 
