@@ -6,7 +6,8 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 This project is developed based on the [OpenPrompt](https://github.com/thunlp/OpenPrompt) framework.
 
-**Fine-tuned filtering model:** [Google Drive](https://drive.google.com/drive/folders/1z38v6nx0pss_hhD2dX9Kg7NXQSNVSIWK?usp=sharing)
+**Fine-tuned filtering model:** [Bi-Encoder Model](https://drive.google.com/drive/folders/1z38v6nx0pss_hhD2dX9Kg7NXQSNVSIWK?usp=sharing) [Cross-Encoder Model](https://drive.google.com/drive/folders/1IkIVE90gXxxX_Vp1-triPIkxOJ2QnkMw?usp=sharing)
+
 
 
 ### Overall Framework
