@@ -6,13 +6,13 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 This project is developed based on the [OpenPrompt](https://github.com/thunlp/OpenPrompt) framework.
 
-**Fine-tuned filtering model:** [Bi-Encoder Model](https://drive.google.com/drive/folders/1z38v6nx0pss_hhD2dX9Kg7NXQSNVSIWK?usp=sharing) [Cross-Encoder Model](https://drive.google.com/drive/folders/1IkIVE90gXxxX_Vp1-triPIkxOJ2QnkMw?usp=sharing)
+**Download our fine-tuned filtering model:** [Bi-Encoder Model](https://drive.google.com/file/d/1PLoMoqr14Kc4RHCglMw_WMn_U0GKAxBN/view?usp=sharing) [Cross-Encoder Model](https://drive.google.com/file/d/1-xH453E-2GsejNdFc9gLg6xrurXembn4/view?usp=sharing)
 
 
 
 ### Overall Framework
 <div align="center">
-  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="300" width="400">
+  <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="400" width="600">
 </div>
 
 
@@ -26,11 +26,11 @@ pip install -r requirements.txt
 ### Prepare the Required Files and Directories
 
 - Replace the placeholder paths in the script with actual paths to your data and configuration files:
-  - --data_dir should point to your data directory
-  - --verbalizer_path should point to your arXiv_knowledgable_verbalizer.txt
-  - --semantic_score_path should point to your arXiv_knowledgable_verbalizer_semantic_search_scores.txt
-  - --doc_id_path should point to your doc_id.txt
-  - --config_path should point to config/arxiv_label_mappings.json
+  - `--data_dir` should point to your data directory
+  - `--verbalizer_path` should point to your arXiv_knowledgable_verbalizer.txt
+  - `--semantic_score_path` should point to your arXiv_knowledgable_verbalizer_semantic_search_scores.txt
+  - `--doc_id_path` should point to your doc_id.txt
+  - `--config_path` should point to config/arxiv_label_mappings.json
 - Prepare your class label dictionary similar to the `.json` files in the [label_mappings](https://github.com/zhiwenyou103/SciPrompt/tree/main/label_mappings) folder
   
 ### Knowledge Retrieval and Filtering
