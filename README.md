@@ -86,4 +86,5 @@ bash run_custom_script.sh
     pages = "6087--6104",
 }
 ```
-
+## Contact Information
+If you have any questions, please email `zhiweny2@illinois.edu`.
