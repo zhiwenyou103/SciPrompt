@@ -10,20 +10,20 @@ This project is developed based on the [OpenPrompt](https://github.com/thunlp/Op
 
 
 
-### Overall Framework
+## Overall Framework
 <div align="center">
   <img src="https://github.com/zhiwenyou103/SciPrompt/blob/main/pics/system.jpg" height="400" width="600">
 </div>
 
 
-### Installation
-To install the necessary Python packages, run the following command:
+## Installation
+To install the necessary Python packages, clone this repo and then run the following command:
 ```bash
 conda create -n SciPrompt python=3.8.12
 pip install -r requirements.txt
 ```
 
-### Prepare the Required Files and Directories
+## Prepare the Required Files and Directories
 
 - Replace the placeholder paths in the script with actual paths to your data and configuration files:
   - `--data_dir` should point to your data directory
@@ -33,9 +33,9 @@ pip install -r requirements.txt
   - `--config_path` should point to config/arxiv_label_mappings.json
 - Prepare your class label dictionary similar to the `.json` files in the [label_mappings](https://github.com/zhiwenyou103/SciPrompt/tree/main/label_mappings) folder
   
-### Knowledge Retrieval and Filtering
+## Knowledge Retrieval and Filtering
 
-- Run our datasets:
+- Run through our datasets:
   - Step 1: Change paths in `run_retrieval.sh` and run `bash run_retrieval.sh`
   - Step 2: Change paths of the filtering model, retrieved data (from Step 1), and output files in the `run_knowledge_filtering.sh` script
   - Step 3: Run the filtering script:
@@ -48,7 +48,7 @@ pip install -r requirements.txt
   - Step 3: Change your dataset name as `custom` and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 189
   - Run `bash run_knowledge_filtering.sh` in your terminal
 
-### Run the main script:
+## Run the main script:
 
 - Execute scripts for each dataset:
 ```bash
@@ -64,7 +64,7 @@ bash run_custom_script.sh
 **Note: Please modify the required data file paths inside each script before running.**
 
 
-### Citation Information
+## Citation Information
 ```bibtex
 
 @inproceedings{you-etal-2024-sciprompt,
