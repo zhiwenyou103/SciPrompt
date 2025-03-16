@@ -5,52 +5,19 @@ from transformers.tokenization_utils import PreTrainedTokenizer
 
 from transformers.utils.dummy_pt_objects import PreTrainedModel
 from .manual_template import ManualTemplate
-from .manual_verbalizer import ManualVerbalizer
-from .mixed_template import MixedTemplate
-from .one2one_verbalizer import One2oneVerbalizer
-from .automatic_verbalizer import AutomaticVerbalizer
-from .prefix_tuning_template import PrefixTuningTemplate
-from .knowledgeable_verbalizer import KnowledgeableVerbalizer
-from .ptuning_prompts import PtuningTemplate
-from .ptr_prompts import PTRTemplate, PTRVerbalizer
-from .knowledgeable_verbalizer import KnowledgeableVerbalizer
-from .prefix_tuning_template import PrefixTuningTemplate
-from .soft_template import SoftTemplate
-
-from .prompt_generator import T5TemplateGenerator, TemplateGenerator, VerbalizerGenerator, RobertaVerbalizerGenerator
-
-from .generation_verbalizer import GenerationVerbalizer
-from .soft_verbalizer import SoftVerbalizer
-from .prototypical_verbalizer import ProtoVerbalizer
+from .kapt_plain_manual_verbalizer import ManualVerbalizer
+from .manual_verbalizer import WeightedVerbalizer
+from .sciprompt_soft import SoftVerbalizer
 
 TEMPLATE_CLASS = {
-    'manual_template': ManualTemplate,
-    'mixed_template': MixedTemplate,
-    'ptuning_template': PtuningTemplate,
-    'soft_template': SoftTemplate,
-    'ptr_template': PTRTemplate,
-    'prefix_tuning_template': PrefixTuningTemplate,
+    'manual_template': ManualTemplate
 }
 
 VERBALIZER_CLASS = {
     'manual_verbalizer': ManualVerbalizer,
-    'knowledgeable_verbalizer': KnowledgeableVerbalizer,
-    'automatic_verbalizer': AutomaticVerbalizer,
-    'ptr_verbalizer': PTRVerbalizer,
-    'one2one_verbalizer': One2oneVerbalizer,
-    'generation_verbalizer': GenerationVerbalizer,
-    'soft_verbalizer': SoftVerbalizer,
-    'proto_verbalizer': ProtoVerbalizer,
+    'knowledgeable_verbalizer': WeightedVerbalizer,
+    'soft_verbalizer': SoftVerbalizer
 }
-
-TEMPLATE_GENERATOR_CLASS = {
-    't5': T5TemplateGenerator
-}
-
-VERBALIZER_GENERATOR_CLASS = {
-    'roberta': RobertaVerbalizerGenerator
-}
-
 
 def load_template(config: CfgNode,
                 **kwargs,
