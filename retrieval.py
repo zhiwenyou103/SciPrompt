@@ -1,7 +1,14 @@
 from retrieval_utils import fetchRelatedWords
 import argparse
+import json
+
+def load_config(config_path):
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+    return config['label_dict'], config['label_name_mapping']
 
 def parse_args():
+    parser = argparse.ArgumentParser()
     parser.add_argument('--config_path', type=str,
                        default='label_mappings/s2orc_label_mappings.json',
                        help='Path to label configuration file')
@@ -53,3 +60,6 @@ def main():
     with open(args.output_path, "w") as file:
         json.dump(words_dict, file)
     
+
+if __name__ == "__main__":
+    main()
