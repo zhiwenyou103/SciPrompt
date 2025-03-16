@@ -4,8 +4,6 @@ from transformers.modeling_utils import PreTrainedModel
 from .utils import TokenizerWrapper
 from transformers.tokenization_utils import PreTrainedTokenizer
 from .mlm import MLMTokenizerWrapper
-from .seq2seq import T5LMTokenizerWrapper, T5TokenizerWrapper
-from .lm import LMTokenizerWrapper
 from transformers import BertConfig, BertTokenizer, BertModel, BertForMaskedLM, \
                          RobertaConfig, RobertaTokenizer, RobertaModel, RobertaForMaskedLM, \
                          AlbertTokenizer, AlbertConfig, AlbertModel, AlbertForMaskedLM, \
@@ -42,47 +40,11 @@ _MODEL_CLASSES = {
         'model': AlbertForMaskedLM,
         'wrapper': MLMTokenizerWrapper
     }),
-    'gpt': ModelClass(**{
-        'config': OpenAIGPTConfig,
-        'tokenizer': OpenAIGPTTokenizer,
-        'model': OpenAIGPTLMHeadModel,
-        'wrapper': LMTokenizerWrapper
-    }),
-    'gpt2': ModelClass(**{
-        'config': GPT2Config,
-        'tokenizer': GPT2Tokenizer,
-        'model': GPT2LMHeadModel,
-        'wrapper': LMTokenizerWrapper
-    }),
-    't5':ModelClass(**{
-        'config': T5Config,
-        'tokenizer': T5Tokenizer,
-        'model': T5ForConditionalGeneration,
-        'wrapper': T5TokenizerWrapper
-    }),
-    't5-lm':ModelClass(**{
-        'config': T5Config,
-        'tokenizer': T5Tokenizer,
-        'model': T5ForConditionalGeneration,
-        'wrapper': T5LMTokenizerWrapper,
-    }),
-    'opt': ModelClass(**{
-        'config': OPTConfig,
-        'tokenizer': GPT2Tokenizer,
-        'model': OPTForCausalLM,
-        'wrapper': LMTokenizerWrapper,
-    }),
     'electra': ModelClass(**{
         'config': ElectraConfig,
         'tokenizer': ElectraTokenizer,
         'model': ElectraForMaskedLM,
         'wrapper': MLMTokenizerWrapper,
-    }),
-    "gptj": ModelClass(**{
-        "config": GPTJConfig, 
-        "tokenizer": GPT2Tokenizer, 
-        "model": GPTJForCausalLM,
-        "wrapper": LMTokenizerWrapper
     }),
 }
 
