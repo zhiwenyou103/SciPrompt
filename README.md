@@ -45,8 +45,8 @@ pip install -r requirements.txt
 
 - Run using your own dataset:
   - Step 1 and 2 are the same as above
-  - Step 3: Change your dataset name as `custom` and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 189
-  - Run `bash run_knowledge_filtering.sh` in your terminal
+  - Step 3: Change your dataset name as `custom` and corresponding configs into the `dataset_configs` dictionary in `knowledge_filtering.py` Line 206
+  - Run `bash run_knowledge_filtering_customized.sh`
 
 ## Run the main script:
 
