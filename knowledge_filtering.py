@@ -68,9 +68,8 @@ def process_initial_label_words(input_json_path, template="The field of this stu
                 
     return wrapped_label_sentence, wrapped_class_label
 
-def filter_label_words(wrapped_label_sentence, bi_encoder, cross_encoder, 
-                      ce_threshold=0.9, semantic_search_threshold=0.5,
-                      device):
+def filter_label_words(wrapped_label_sentence, bi_encoder, cross_encoder, device,
+                      ce_threshold=0.9, semantic_search_threshold=0.5):
     """Filter label words using NLI model"""
     pred_labels = {}
     pred_semantic_scores = {}
@@ -161,9 +160,9 @@ def process_dataset(config, bi_encoder, cross_encoder, ce_threshold, semantic_th
             wrapped_label_sentence, 
             bi_encoder, 
             cross_encoder,
+            device,
             ce_threshold,
-            semantic_threshold,
-            device
+            semantic_threshold
         )
         
         save_filtered_words(
@@ -222,11 +221,11 @@ def main():
             bi_encoder, 
             cross_encoder,
             args.ce_threshold,
-            args.semantic_threshold
+            args.semantic_threshold,
             args.device
         )
         if result is not None:
-            results[dataset_key] = result
+            results[args.dataset] = result
     else:
         config = dataset_configs[args.dataset]
         print(f"\nProcessing {config['name']}...")
@@ -235,7 +234,7 @@ def main():
             bi_encoder, 
             cross_encoder,
             args.ce_threshold,
-            args.semantic_threshold
+            args.semantic_threshold,
             args.device
         )
         if result is not None:
