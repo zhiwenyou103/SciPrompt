@@ -1,28 +1,12 @@
 from yacs.config import CfgNode
-from .typing_dataset import PROCESSORS as TYPING_PROCESSORS
 from .text_classification_dataset import PROCESSORS as TC_PROCESSORS
-from .fewglue_dataset import PROCESSORS as SUPERGLUE_PROCESSORS
-from .relation_classification_dataset import PROCESSORS as RC_PROCESSORS
-from .lama_dataset import PROCESSORS as LAMA_PROCESSORS
-from .conditional_generation_dataset import PROCESSORS as CG_PROCESSORS
 from .utils import InputExample, InputFeatures
 from .data_sampler import FewShotSampler
-# support loading transformers datasets from https://huggingface.co/docs/datasets/
-from .nli_dataset import PROCESSORS as NLI_PROCESSORS
 
 from openprompt.utils.logging import logger
-from openprompt.data_utils.huggingface_dataset import PROCESSORS as HF_PROCESSORS
 
 PROCESSORS = {
-    **TYPING_PROCESSORS,
     **TC_PROCESSORS,
-    **SUPERGLUE_PROCESSORS,
-    **RC_PROCESSORS,
-    **LAMA_PROCESSORS,
-    **CG_PROCESSORS,
-    **LAMA_PROCESSORS,
-    **HF_PROCESSORS,
-    **NLI_PROCESSORS,
 }
 
 
