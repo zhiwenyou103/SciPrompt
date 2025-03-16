@@ -65,6 +65,7 @@ bash run_custom_script.sh
 
 
 ## Citation Information
+For the use of SciPrompt and Emerging NLP benchmark, please cite:
 ```bibtex
 
 @inproceedings{you-etal-2024-sciprompt,
