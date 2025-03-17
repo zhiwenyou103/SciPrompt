@@ -7,9 +7,10 @@ python sdpra_script.py \
     --max_epochs 5 \
     --cuda_device 0 \
     --learning_rate 3e-5 \
-    --data_dir "/path/to/your/data/" \
-    --verbalizer_path "/path/to/your/sdpra_knowledgable_verbalizer.txt" \
-    --semantic_score_path "/path/to/your/sdpra_knowledgable_verbalizer_semantic_search_scores.txt" \
-    --doc_id_path "/path/to/your/label_dict.txt" \
+    --soft_verbalizer False \ # whether using the Soft verbalization method
+    --data_dir "/path/to/your/data/" \ # e.g., data/SDPRA
+    --verbalizer_path "knowledge_output/SDPRA_output_words.txt" \ # filtered verbalizer
+    --semantic_score_path "scores/SDPRA_output_scores.tx" \
+    --doc_id_path "data/SDPRA/label_dict.txt" \
     --config_path "label_mappings/SDPRA_label_mappings.json" \
     --zero_shot no
