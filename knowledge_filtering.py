@@ -31,12 +31,15 @@ def parse_args():
     parser.add_argument('--device', type=str, default='cuda:0',
                       help='Device to run models on')
     parser.add_argument('--dataset', type=str, required=True,
-                      help='Which dataset to process (s2orc, arxiv, sdpra, all, or custom)')
+                      choices=['s2orc', 'arxiv', 'sdpra', 'custom'],
+                      help='Which dataset to process')
     
     parser.add_argument('--bi_encoder_path', type=str, required=True,
                       help='Path to bi-encoder NLI model')
     parser.add_argument('--cross_encoder_path', type=str, required=True,
                       help='Path to cross-encoder model')
+    parser.add_argument('--mapping_file', type=str,
+                      help='Path to label mappings JSON file')
 
     for dataset in ['s2orc', 'arxiv', 'sdpra', 'custom']:
         parser.add_argument(f'--{dataset}_input', type=str,
@@ -52,24 +55,53 @@ def parse_args():
     parser.add_argument('--semantic_threshold', type=float, default=0.5,
                       help='Semantic search threshold')
     
-    return parser.parse_args()
+    args = parser.parse_args()
+    
+    # Validate that required paths exist for selected dataset
+    if not args.__dict__[f'{args.dataset}_input']:
+        parser.error(f'--{args.dataset}_input is required when dataset is {args.dataset}')
+    if not args.__dict__[f'{args.dataset}_output_words']:
+        parser.error(f'--{args.dataset}_output_words is required when dataset is {args.dataset}')
+    if not args.__dict__[f'{args.dataset}_output_scores']:
+        parser.error(f'--{args.dataset}_output_scores is required when dataset is {args.dataset}')
+        
+    return args
 
-def process_initial_label_words(input_json_path, template="The field of this study is related to "):
-    """Process initial label words from JSON file"""
+def process_initial_label_words(input_json_path, template="The field of this study is related to ", mapping_file=None):
+    """Process initial label words from JSON file
+    
+    Args:
+        input_json_path: Path to input JSON with label words
+        template: Template string to wrap around labels and words
+        mapping_file: Path to label mappings JSON file. If None, uses labels as-is
+    """
     wrapped_label_sentence = {}
     wrapped_class_label = []
+    
+    # Load label mappings if provided
+    label_name_mapping = {}
+    if mapping_file:
+        with open(mapping_file, 'r') as f:
+            mappings = json.load(f)
+            label_name_mapping = mappings['label_name_mapping']
     
     with open(input_json_path, 'r') as file:
         data = json.load(file)
         for key, value in data.items():
-            class_text = template + key
+            if key.lower() in [k.lower() for k in label_name_mapping.keys()]:
+                actual_key = next(k for k in label_name_mapping.keys() if k.lower() == key.lower())
+                mapped_key = label_name_mapping[actual_key][0] 
+            else:
+                mapped_key = key
+                
+            class_text = template + mapped_key
             wrapped_class_label.append(class_text)
             wrapped_label_sentence[class_text] = [template + word for word in value]
                 
     return wrapped_label_sentence, wrapped_class_label
 
 def filter_label_words(wrapped_label_sentence, bi_encoder, cross_encoder, device,
-                      ce_threshold=0.9, semantic_search_threshold=0.5):
+                      ce_threshold=0.1, semantic_search_threshold=0.5):
     """Filter label words using NLI model"""
     pred_labels = {}
     pred_semantic_scores = {}
@@ -91,15 +123,17 @@ def filter_label_words(wrapped_label_sentence, bi_encoder, cross_encoder, device
         for idx, score in enumerate(cross_scores):
             hits[idx]['cross-score'] = score
         
-        hits = sorted(hits, key=lambda x: x['cross-score'], reverse=True)
+        hits = sorted(hits, key=lambda x: x['cross-score'], reverse=False)
         
         for hit in hits:
-            if hit['cross-score'] <= ce_threshold and hit['score'] <= semantic_search_threshold:
+            label = 'contrasting'
+            if hit['cross-score'] >= ce_threshold and hit['score'] <= semantic_search_threshold:
                 label = 'contrasting'
-            elif hit['cross-score'] > ce_threshold and hit['score'] > semantic_search_threshold:
+            elif hit['cross-score'] < ce_threshold and hit['score'] > semantic_search_threshold:
                 label = 'entailment'
                 satisfied_items[class_label].append(wrapped_words[hit['corpus_id']])
-                hit['score'] = min(hit['score'], 1.0)
+                if hit['score'] > 1:
+                    hit['score'] = 1
                 pred_semantic_scores[class_label].append(hit['score'])
             pred_labels[class_label].append(label)
             
@@ -110,6 +144,8 @@ def save_filtered_words(satisfied_items, pred_semantic_scores, words_path, score
     label_words = []
     class_name = []
     label_words_scores = []
+    counter = 0  # Counter for short words
+    score_counter = 0  # Counter for zero scores
     
     Path(words_path).parent.mkdir(parents=True, exist_ok=True)
     Path(scores_path).parent.mkdir(parents=True, exist_ok=True)
@@ -123,17 +159,33 @@ def save_filtered_words(satisfied_items, pred_semantic_scores, words_path, score
             class_name.append(class_subject.lower())
             
         label_word_temp = []
-        valid_scores = []
+        temp_scores = []
+        
         for i, sentence in enumerate(filtered_sentences):
             index_related_to = sentence.find("study is related to")
             if index_related_to != -1:
                 subject = sentence[index_related_to + len("study is related to"):].strip(". ,")
-                if len(subject) >= 3:
+                if len(subject) < 3:
+                    print(subject)  # Print short words as in original
+                    scores[i] = 0.0
+                    counter += 1
+                else:
                     label_word_temp.append(subject)
-                    valid_scores.append(scores[i])
-                    
+            else:
+                print("index error")
+                
+        # Handle scores like in original code
+        for score in scores:
+            if score == 0.0:
+                score_counter += 1
+            else:
+                temp_scores.append(score)
+                
         label_words.append(label_word_temp)
-        label_words_scores.append(valid_scores)
+        label_words_scores.append(temp_scores)
+    
+    print(f"Short words found: {counter}")
+    print(f"Zero scores found: {score_counter}")
     
     # Save filtered words
     with open(words_path, "w") as file:
@@ -152,10 +204,13 @@ def save_filtered_words(satisfied_items, pred_semantic_scores, words_path, score
             else:
                 file.write(f"1,{','.join(map(str, scores))}\n")
 
-def process_dataset(config, bi_encoder, cross_encoder, ce_threshold, semantic_threshold, device):
+def process_dataset(config, bi_encoder, cross_encoder, ce_threshold, semantic_threshold, device, mapping_file=None):
     """Process a single dataset"""
     try:
-        wrapped_label_sentence, _ = process_initial_label_words(config['input'])
+        wrapped_label_sentence, _ = process_initial_label_words(
+            config['input'],
+            mapping_file=mapping_file
+        )
         pred_labels, pred_semantic_scores, satisfied_items = filter_label_words(
             wrapped_label_sentence, 
             bi_encoder, 
@@ -202,7 +257,6 @@ def main():
             'output_scores': args.sdpra_output_scores,
             'name': 'SDPRA'
         },
-        # Add custom dataset configurations here
         'custom': {
             'input': args.custom_input,
             'output_words': args.custom_output_words,
@@ -212,33 +266,19 @@ def main():
     }
     
     results = {}
-    
-    if args.dataset in ['s2orc', 'arxiv', 'sdpra']:
-        config = dataset_configs[args.dataset]
-        print(f"\nProcessing {config['name']}...")
-        result = process_dataset(
-            config, 
-            bi_encoder, 
-            cross_encoder,
-            args.ce_threshold,
-            args.semantic_threshold,
-            args.device
-        )
-        if result is not None:
-            results[args.dataset] = result
-    else:
-        config = dataset_configs[args.dataset]
-        print(f"\nProcessing {config['name']}...")
-        result = process_dataset(
-            config, 
-            bi_encoder, 
-            cross_encoder,
-            args.ce_threshold,
-            args.semantic_threshold,
-            args.device
-        )
-        if result is not None:
-            results[args.dataset] = result
+    config = dataset_configs[args.dataset]
+    print(f"\nProcessing {config['name']}...")
+    result = process_dataset(
+        config, 
+        bi_encoder, 
+        cross_encoder,
+        args.ce_threshold,
+        args.semantic_threshold,
+        args.device,
+        args.mapping_file
+    )
+    if result is not None:
+        results[args.dataset] = result
     
     print("\nProcessing Summary:")
     for dataset_name, num_labels in results.items():
