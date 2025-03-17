@@ -1,15 +1,16 @@
 python arXiv_script.py \
     --seed 144 \
-    --shots 5 \
+    --shots 5 \ # training shots
     --calibration True \
     --max_seq_length 256 \
     --batch_size 5 \
     --max_epochs 5 \
     --cuda_device 0 \
     --learning_rate 3e-5 \
-    --data_dir "/path/to/your/data/" \
-    --verbalizer_path "/path/to/your/arXiv_knowledgable_verbalizer.txt" \
-    --semantic_score_path "/path/to/your/arXiv_knowledgable_verbalizer_semantic_search_scores.txt" \
-    --doc_id_path "/path/to/your/label_dict.txt" \
+    --soft_verbalizer False \ # whether using the Soft verbalization method 
+    --data_dir "/path/to/your/data/" \ # e.g., data/arXiv
+    --verbalizer_path "knowledge_output/arXiv_output_words.txt" \ # filtered verbalizer
+    --semantic_score_path "scores/arXiv_output_scores.tx" \
+    --doc_id_path "data/arXiv/label_dict.txt" \
     --config_path "label_mappings/arXiv_label_mappings.json" \
     --zero_shot no
