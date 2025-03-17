@@ -2,7 +2,8 @@
 [![Paper](http://img.shields.io/badge/paper-ACL--anthology-B31B1B.svg)](https://aclanthology.org/2024.emnlp-main.350.pdf)
 
 # SciPrompt
-The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Knowledge-augmented Prompting for Fine-grainedCategorization of Scientific Topics](https://aclanthology.org/2024.emnlp-main.350/)
+`SciPrompt` is a framework designed to automatically retrieve scientific topic-related terms for low-resource text classification tasks, including few-shot and zero-shot settings.
+
 
 ## News
 - (2025.03.16) Our datasets can be downloaded [here](https://drive.google.com/file/d/1w5IxtfayNPlrAE6I_vp2zKhx8ntDMRMv/view).
