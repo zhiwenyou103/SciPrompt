@@ -24,7 +24,7 @@
 ## Installation
 To install the necessary Python packages, clone this repo and then run the following command:
 ```bash
-conda create -n SciPrompt python=3.8.12
+conda create -n sciprompt python=3.8.12
 pip install -r requirements.txt
 ```
 
