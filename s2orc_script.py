@@ -18,7 +18,7 @@ from openprompt import PromptDataLoader, PromptForClassification
 from openprompt.data_utils.data_sampler import FewShotSampler
 from openprompt.utils.reproduciblity import set_seed
 from contextualize_calibration import calibrate
-from related_words import fetchRelatedWords
+from retrieval_utils import fetchRelatedWords
 
 def parse_args():
     parser = argparse.ArgumentParser(description='S2ORC KAPT Training')
@@ -284,6 +284,23 @@ def run_few_shot_training(args, prompt_model, dataset, mytemplate, myverbalizer,
 
 def main():
     args = parse_args()
+    
+    # Validate required files and directories exist
+    required_files = [
+        args.verbalizer_path,
+        args.semantic_score_path,
+        args.doc_id_path,
+        args.config_path,
+        os.path.join(args.data_dir, "train_dataset.txt"),
+        os.path.join(args.data_dir, "train_labels.txt"),
+        os.path.join(args.data_dir, "300_random_sample_test_dataset.txt"),
+        os.path.join(args.data_dir, "300_random_sample_test_labels.txt")
+    ]
+    
+    for file_path in required_files:
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"Required file not found: {file_path}")
+    
     set_seed(args.seed)
     device = f"cuda:{args.cuda_device}" if torch.cuda.is_available() else "cpu"
     
