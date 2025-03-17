@@ -10,7 +10,7 @@
 
 
 ## News
-- (2025.03.16) `[Emerging NLP](https://huggingface.co/datasets/uzw/Emerging_NLP)` dataset is available on 🤗 Hugging Face!
+- (2025.03.16) [`Emerging NLP`](https://huggingface.co/datasets/uzw/Emerging_NLP) dataset is available on 🤗 Hugging Face!
 - (2025.03.16) Our datasets can be downloaded [here](https://drive.google.com/file/d/1w5IxtfayNPlrAE6I_vp2zKhx8ntDMRMv/view).
 - (2024.12.01) Download the fine-tuned `filtering models`:
     - [Bi-Encoder Model](https://drive.google.com/file/d/1PLoMoqr14Kc4RHCglMw_WMn_U0GKAxBN/view?usp=sharing)
