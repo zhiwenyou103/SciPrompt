@@ -6,7 +6,7 @@ The official repository of our EMNLP 2024 Main conference paper: [SciPrompt: Kno
 
 ## News
 - (2025.03.16) Our datasets can be downloaded [here](https://drive.google.com/file/d/1w5IxtfayNPlrAE6I_vp2zKhx8ntDMRMv/view).
-- Download the fine-tuned `filtering models`:
+- (2024.12.01) Download the fine-tuned `filtering models`:
     - [Bi-Encoder Model](https://drive.google.com/file/d/1PLoMoqr14Kc4RHCglMw_WMn_U0GKAxBN/view?usp=sharing)
     - [Cross-Encoder Model](https://drive.google.com/file/d/1-xH453E-2GsejNdFc9gLg6xrurXembn4/view?usp=sharing)
 
