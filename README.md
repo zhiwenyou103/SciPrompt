@@ -1,11 +1,16 @@
-[![Conference](https://img.shields.io/badge/EMNLP-2024-4b44ce)](https://2024.emnlp.org/)
-[![Paper](http://img.shields.io/badge/paper-ACL--anthology-B31B1B.svg)](https://aclanthology.org/2024.emnlp-main.350.pdf)
+<div align="left">
+  <a href="https://2024.emnlp.org/"><img src="https://img.shields.io/badge/EMNLP-Conference-blue" alt="EMNLP"></a>
+  <a href="https://aclanthology.org/2024.emnlp-main.350"><img src="https://img.shields.io/badge/ACL-Anthology-B31B1B" alt="ACL"></a>
+  <a href="https://huggingface.co/datasets/uzw/Emerging_NLP"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-blue?color=8A2BE2" alt="Dataset"></a>
+</div>
+
 
 # SciPrompt
 `SciPrompt` is a framework designed to automatically retrieve scientific topic-related terms for low-resource text classification tasks, including few-shot and zero-shot settings.
 
 
 ## News
+- (2025.03.16) `[Emerging NLP](https://huggingface.co/datasets/uzw/Emerging_NLP)` dataset is available on 🤗 Hugging Face!
 - (2025.03.16) Our datasets can be downloaded [here](https://drive.google.com/file/d/1w5IxtfayNPlrAE6I_vp2zKhx8ntDMRMv/view).
 - (2024.12.01) Download the fine-tuned `filtering models`:
     - [Bi-Encoder Model](https://drive.google.com/file/d/1PLoMoqr14Kc4RHCglMw_WMn_U0GKAxBN/view?usp=sharing)
